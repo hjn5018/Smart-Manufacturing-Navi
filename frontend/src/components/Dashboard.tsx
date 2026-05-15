@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getLines, ProductionLine } from '../services/api';
+import { getLines } from '../services/api';
+import type { ProductionLine } from '../services/api';
 import { Activity, Settings, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
@@ -24,7 +25,7 @@ export const Dashboard: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     fetchData();
     const interval = setInterval(fetchData, 5000); // 5초마다 데이터 갱신
     return () => clearInterval(interval);
@@ -52,11 +53,11 @@ export const Dashboard: React.FC = () => {
           <p className="text-slate-400 mt-1">실시간 공정 모니터링 및 AI 제어 센터</p>
         </div>
         <div className="flex items-center space-x-3 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50 shadow-lg backdrop-blur-sm">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-            </span>
-            <span className="text-sm font-semibold text-emerald-400 tracking-wide">SYSTEM ONLINE</span>
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+          <span className="text-sm font-semibold text-emerald-400 tracking-wide">SYSTEM ONLINE</span>
         </div>
       </header>
 
@@ -64,7 +65,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {lines.map((line) => (
           <div key={line.line_id} className="bg-slate-800/40 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-6 md:p-8 shadow-2xl hover:border-slate-600/60 hover:bg-slate-800/60 hover:-translate-y-1 transition-all duration-300 group">
-            
+
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h2 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
@@ -72,10 +73,10 @@ export const Dashboard: React.FC = () => {
                   {line.name}
                 </h2>
                 <div className="flex items-center gap-3 mt-3">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider ${line.status === 'running' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`}>
-                        {line.status.toUpperCase()}
-                    </span>
-                    <span className="text-slate-400 text-sm font-medium">목표 생산량: {line.target_production.toLocaleString()}</span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider ${line.status === 'running' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}`}>
+                    {line.status.toUpperCase()}
+                  </span>
+                  <span className="text-slate-400 text-sm font-medium">목표 생산량: {line.target_production.toLocaleString()}</span>
                 </div>
               </div>
               <div className="text-right">
@@ -91,8 +92,8 @@ export const Dashboard: React.FC = () => {
                 <span className="text-cyan-400">{((line.current_production / line.target_production) * 100).toFixed(1)}%</span>
               </div>
               <div className="w-full bg-slate-900/80 rounded-full h-3 overflow-hidden border border-slate-800/50">
-                <div 
-                  className="bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400 h-full rounded-full transition-all duration-1000 ease-out relative shadow-[0_0_15px_rgba(34,211,238,0.4)]" 
+                <div
+                  className="bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400 h-full rounded-full transition-all duration-1000 ease-out relative shadow-[0_0_15px_rgba(34,211,238,0.4)]"
                   style={{ width: `${(line.current_production / line.target_production) * 100}%` }}
                 >
                   <div className="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/30 rounded-full"></div>
@@ -103,12 +104,12 @@ export const Dashboard: React.FC = () => {
             {/* 주요 지표 */}
             <div className="grid grid-cols-2 gap-4 mb-8">
               <div className="bg-slate-900/40 rounded-2xl p-5 border border-slate-700/30">
-                  <div className="text-slate-400 text-sm font-medium mb-2">불량률 (Defect Rate)</div>
-                  <div className="text-3xl font-bold text-rose-400">{(line.defect_rate * 100).toFixed(1)}<span className="text-lg text-rose-400/70">%</span></div>
+                <div className="text-slate-400 text-sm font-medium mb-2">불량률 (Defect Rate)</div>
+                <div className="text-3xl font-bold text-rose-400">{(line.defect_rate * 100).toFixed(1)}<span className="text-lg text-rose-400/70">%</span></div>
               </div>
               <div className="bg-slate-900/40 rounded-2xl p-5 border border-slate-700/30">
-                  <div className="text-slate-400 text-sm font-medium mb-2">가동 설비 수 (Active)</div>
-                  <div className="text-3xl font-bold text-cyan-400">{line.equipments.length}<span className="text-lg text-cyan-400/70">ea</span></div>
+                <div className="text-slate-400 text-sm font-medium mb-2">가동 설비 수 (Active)</div>
+                <div className="text-3xl font-bold text-cyan-400">{line.equipments.length}<span className="text-lg text-cyan-400/70">ea</span></div>
               </div>
             </div>
 
@@ -120,8 +121,8 @@ export const Dashboard: React.FC = () => {
               {line.equipments.map(eq => (
                 <div key={eq.equipment_id} className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-slate-700/50 hover:bg-slate-700/80 transition-colors">
                   <div className="flex items-center gap-4">
-                    {eq.status === 'running' ? 
-                      <div className="p-2 bg-emerald-500/10 rounded-lg"><CheckCircle2 className="w-5 h-5 text-emerald-400" /></div> : 
+                    {eq.status === 'running' ?
+                      <div className="p-2 bg-emerald-500/10 rounded-lg"><CheckCircle2 className="w-5 h-5 text-emerald-400" /></div> :
                       <div className="p-2 bg-amber-500/10 rounded-lg"><AlertTriangle className="w-5 h-5 text-amber-400" /></div>
                     }
                     <div>
@@ -135,14 +136,14 @@ export const Dashboard: React.FC = () => {
                 </div>
               ))}
             </div>
-            
+
             {/* 미니 차트 (온도 변화 시뮬레이션) */}
             <div className="mt-8 h-24 w-full opacity-40 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={mockChartData}>
-                        <Line type="monotone" dataKey="temp" stroke="#22d3ee" strokeWidth={2} dot={false} strokeOpacity={0.8} />
-                    </LineChart>
-                </ResponsiveContainer>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={mockChartData}>
+                  <Line type="monotone" dataKey="temp" stroke="#22d3ee" strokeWidth={2} dot={false} strokeOpacity={0.8} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         ))}
