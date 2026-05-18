@@ -26,26 +26,6 @@ class ControlRequest(BaseModel):
     action: ControlActionEnum = Field(..., description="수행할 제어 명령 (start, stop, set_speed)")
     value: Optional[float] = Field(None, description="set_speed 명령 시 설정할 속도 값 (start/stop 시 생략 가능)")
 
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "equipment_id": "eq_101",
-                    "action": "start"
-                },
-                {
-                    "equipment_id": "eq_101",
-                    "action": "set_speed",
-                    "value": 1.5
-                },
-                {
-                    "equipment_id": "eq_101",
-                    "action": "stop"
-                }
-            ]
-        }
-    }
-
 @router.post("/control")
 def control_equipment(
     req: ControlRequest = Body(
