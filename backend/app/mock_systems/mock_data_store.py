@@ -10,7 +10,7 @@ mock_lines = [
         equipments=[
             EquipmentStatus(
                 equipment_id="eq_101",
-                name="메인 컨베이어 벨트",
+                name="초기 가공 프레스",
                 status="running",
                 speed=1.5,
                 sensor_data=SensorData(temperature=25.5, pressure=1.0, vibration=0.5)

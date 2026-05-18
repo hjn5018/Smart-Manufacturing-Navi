@@ -1,14 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getLines, controlEquipment } from '../services/api';
 import type { ProductionLine } from '../services/api';
-import { Activity, Settings, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { LineChart, Line, ResponsiveContainer } from 'recharts';
-
-// 시각화를 위한 Mock 차트 데이터
-const mockChartData = Array.from({ length: 20 }, (_, i) => ({
-  time: `${i}m`,
-  temp: 20 + Math.random() * 10,
-}));
+import { Activity, Settings, AlertTriangle, CheckCircle2, Map } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const [lines, setLines] = useState<ProductionLine[]>([]);
@@ -60,12 +54,17 @@ export const Dashboard: React.FC = () => {
           </h1>
           <p className="text-slate-400 mt-1">실시간 공정 모니터링 및 AI 제어 센터</p>
         </div>
-        <div className="flex items-center space-x-3 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50 shadow-lg backdrop-blur-sm">
-          <span className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-          </span>
-          <span className="text-sm font-semibold text-emerald-400 tracking-wide">SYSTEM ONLINE</span>
+        <div className="flex items-center space-x-4">
+          <Link to="/simulator" className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-lg font-bold transition-all shadow-lg shadow-cyan-500/20">
+            <Map className="w-4 h-4" /> 팩토리 뷰
+          </Link>
+          <div className="flex items-center space-x-3 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700/50 shadow-lg backdrop-blur-sm">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            <span className="text-sm font-semibold text-emerald-400 tracking-wide">SYSTEM ONLINE</span>
+          </div>
         </div>
       </header>
 
@@ -121,6 +120,7 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
+
             {/* 설비 리스트 */}
             <div className="space-y-3">
               <h3 className="text-sm font-bold text-slate-300 flex items-center gap-2 mb-4 uppercase tracking-wider">
@@ -150,15 +150,6 @@ export const Dashboard: React.FC = () => {
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* 미니 차트 (온도 변화 시뮬레이션) */}
-            <div className="mt-8 h-24 w-full opacity-40 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockChartData}>
-                  <Line type="monotone" dataKey="temp" stroke="#22d3ee" strokeWidth={2} dot={false} strokeOpacity={0.8} />
-                </LineChart>
-              </ResponsiveContainer>
             </div>
           </div>
         ))}
