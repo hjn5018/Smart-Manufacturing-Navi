@@ -1,10 +1,12 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from typing import List, Optional
-from pydantic import BaseModel
-from app.models.mock_data import ProductionLine, ErrorLog
+from pydantic import BaseModel, Field
+from app.models.mock_data import ProductionLine, ErrorLog, ControlActionEnum, EquipmentStatusEnum
 from app.mock_systems.mock_data_store import mock_lines, mock_logs
 
 router = APIRouter()
+
+DEFAULT_SPEED = 1.0
 
 @router.get("/lines", response_model=List[ProductionLine])
 def get_all_lines():
@@ -20,23 +22,71 @@ def get_line(line_id: str):
     raise HTTPException(status_code=404, detail="Line not found")
 
 class ControlRequest(BaseModel):
-    equipment_id: str
-    action: str  # "start", "stop", "set_speed"
-    value: Optional[float] = None
+    equipment_id: str = Field(..., description="제어할 설비의 ID (예: eq_101)")
+    action: ControlActionEnum = Field(..., description="수행할 제어 명령 (start, stop, set_speed)")
+    value: Optional[float] = Field(None, description="set_speed 명령 시 설정할 속도 값 (start/stop 시 생략 가능)")
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "equipment_id": "eq_101",
+                    "action": "start"
+                },
+                {
+                    "equipment_id": "eq_101",
+                    "action": "set_speed",
+                    "value": 1.5
+                },
+                {
+                    "equipment_id": "eq_101",
+                    "action": "stop"
+                }
+            ]
+        }
+    }
 
 @router.post("/control")
-def control_equipment(req: ControlRequest):
+def control_equipment(
+    req: ControlRequest = Body(
+        ...,
+        openapi_examples={
+            "start_equipment": {
+                "summary": "설비 가동 (Start)",
+                "value": {
+                    "equipment_id": "eq_101",
+                    "action": "start"
+                }
+            },
+            "stop_equipment": {
+                "summary": "설비 정지 (Stop)",
+                "value": {
+                    "equipment_id": "eq_101",
+                    "action": "stop"
+                }
+            },
+            "set_speed": {
+                "summary": "속도 변경 (Set Speed)",
+                "value": {
+                    "equipment_id": "eq_101",
+                    "action": "set_speed",
+                    "value": 1.5
+                }
+            }
+        }
+    )
+):
     """설비 제어 요청 (PLC Mock)"""
     for line in mock_lines:
         for eq in line.equipments:
             if eq.equipment_id == req.equipment_id:
-                if req.action == "stop":
-                    eq.status = "stopped"
+                if req.action == ControlActionEnum.STOP:
+                    eq.status = EquipmentStatusEnum.STOPPED
                     eq.speed = 0.0
-                elif req.action == "start":
-                    eq.status = "running"
-                    eq.speed = req.value if req.value is not None else 1.0
-                elif req.action == "set_speed" and req.value is not None:
+                elif req.action == ControlActionEnum.START:
+                    eq.status = EquipmentStatusEnum.RUNNING
+                    eq.speed = req.value if req.value is not None else DEFAULT_SPEED
+                elif req.action == ControlActionEnum.SET_SPEED and req.value is not None:
                     eq.speed = req.value
                 return {"status": "success", "message": f"설비 {eq.name} 제어 완료", "equipment": eq}
     

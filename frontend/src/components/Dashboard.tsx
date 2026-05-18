@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getLines } from '../services/api';
+import { getLines, controlEquipment } from '../services/api';
 import type { ProductionLine } from '../services/api';
 import { Activity, Settings, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
@@ -27,9 +27,17 @@ export const Dashboard: React.FC = () => {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 5000); // 5초마다 데이터 갱신
+    const interval = setInterval(fetchData, 1000); // 1초마다 실시간 갱신 (시뮬레이션)
     return () => clearInterval(interval);
   }, []);
+
+  const handleControl = async (equipment_id: string, action: string, value?: number) => {
+    try {
+      await controlEquipment(equipment_id, action, value);
+    } catch (error) {
+      console.error('Failed to control equipment', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -130,8 +138,15 @@ export const Dashboard: React.FC = () => {
                       <div className="text-xs text-slate-400 mt-0.5">온도: {eq.sensor_data.temperature.toFixed(1)}°C | 진동: {eq.sensor_data.vibration.toFixed(2)}</div>
                     </div>
                   </div>
-                  <div className="text-sm font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-800/50 px-3 py-1.5 rounded-lg shadow-inner">
-                    {eq.speed.toFixed(1)}x
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm font-mono text-cyan-300 bg-cyan-950/40 border border-cyan-800/50 px-3 py-1.5 rounded-lg shadow-inner">
+                      {eq.speed.toFixed(1)}x
+                    </div>
+                    {eq.status === 'running' ? (
+                      <button onClick={() => handleControl(eq.equipment_id, 'stop')} className="px-3 py-1.5 bg-rose-500/20 text-rose-300 rounded-lg hover:bg-rose-500/40 text-xs font-bold transition cursor-pointer">정지</button>
+                    ) : (
+                      <button onClick={() => handleControl(eq.equipment_id, 'start')} className="px-3 py-1.5 bg-emerald-500/20 text-emerald-300 rounded-lg hover:bg-emerald-500/40 text-xs font-bold transition cursor-pointer">가동</button>
+                    )}
                   </div>
                 </div>
               ))}

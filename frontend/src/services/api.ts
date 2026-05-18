@@ -30,3 +30,8 @@ export const getLines = async (): Promise<ProductionLine[]> => {
   const response = await axios.get(`${API_URL}/lines`);
   return response.data;
 };
+
+export const controlEquipment = async (equipment_id: string, action: string, value?: number) => {
+  const response = await axios.post(`${API_URL}/control`, { equipment_id, action, value });
+  return response.data;
+};

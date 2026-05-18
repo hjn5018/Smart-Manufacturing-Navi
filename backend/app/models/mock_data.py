@@ -1,6 +1,18 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+from enum import Enum
+
+class EquipmentStatusEnum(str, Enum):
+    RUNNING = "running"
+    STOPPED = "stopped"
+    ERROR = "error"
+    MAINTENANCE = "maintenance"
+
+class ControlActionEnum(str, Enum):
+    START = "start"
+    STOP = "stop"
+    SET_SPEED = "set_speed"
 
 class SensorData(BaseModel):
     temperature: float
@@ -10,14 +22,14 @@ class SensorData(BaseModel):
 class EquipmentStatus(BaseModel):
     equipment_id: str
     name: str
-    status: str  # "running", "stopped", "error"
+    status: EquipmentStatusEnum
     speed: float # e.g. conveyor belt speed
     sensor_data: SensorData
 
 class ProductionLine(BaseModel):
     line_id: str
     name: str
-    status: str  # "running", "stopped", "maintenance"
+    status: EquipmentStatusEnum
     equipments: List[EquipmentStatus]
     defect_rate: float
     target_production: int
